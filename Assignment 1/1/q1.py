@@ -12,12 +12,16 @@ print("Matrix :- ")
 print("----------------")
 object1.print()
 print("----------------")
-print("Sum :-",object1.sum())
-print("Max :-",object1.maximum())
-print("Mean :-",object1.mean())
-print("Meadian :-",object1.median())
-print("Mode :-",object1.mode())
-print("Standeard Deviation :-",object1.standard_deviation())
-freq,array=object1.frequency_distribution()
-print("Frequency Distribution Value:-",array)
-print("Frequency Distribution Freq :-",freq)
+print_table([
+    ["Sum :-",object1.sum()],
+    ["Max :-",object1.maximum()],
+    ["Mean :-",object1.mean()],
+    ["Meadian :-",object1.median()],
+    ["Mode :-",object1.mode()],
+    ["Standeard Deviation :-",object1.standard_deviation()],
+],["Defination","Value"],25)
+data=[];array,freq=object1.frequency_distribution()
+for i in range(len(array)):
+    data.append([array[i],freq[i]])
+print("Frequency Distribution")
+print_table(data,["Value","Frequency"])
