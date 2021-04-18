@@ -31,6 +31,6 @@ def fft(x):
 
 
 if __name__ == "__main__":
-  x=np.array([2,4,6,8,1,2])   
+  x=np.array([2,4,6,8])   
   print(fft(x))
   print(np.allclose(fft(x), np.fft.fft(x)))
