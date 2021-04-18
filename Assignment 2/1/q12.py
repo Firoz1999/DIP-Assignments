@@ -8,76 +8,27 @@ class Index:
         self.x=x
         self.y=y
 
-def func(value,beg,end):
-    if value<beg:
-        return beg
-    elif value>=beg and value<=end:
-        return value
-    else:
-        return end
-
-def overlap(
-        mat_size=Mat(4,4),
-        filter_size=Mat(3,3),
-        filter_center=Index(1,1),
-        matrix_index=Index(0,0)
-    ):
-    local=[]
-    for i in range(
-            func(0-filter_center.x+matrix_index.x,0,mat_size.row),
-            func(filter_size.row-1-filter_center.x+matrix_index.x+1,0,mat_size.row)
-        ):
-        for j in range(
-                func(0-filter_center.y+matrix_index.y,0,mat_size.col),
-                func(filter_size.col-1-filter_center.y+matrix_index.y+1,0,mat_size.col)
-            ):
-            # print((i,j),end=",")
-            local.append((i,j))
-        # print()
-    return local
+def func_update(value,beg,end):
+    return max(beg,min(value,end))
 
 def median_filtering(img,filter_size=Mat(3,3),filter_center=Index(1,1)):
     row,col,ch=img.shape
+    print("Shape ",img.shape)
     total=100/(row*col)
     counter=0
-    print("Shape ",img.shape)
     img_copy=img.copy()
     for i in range(row):
         for j in range(col):
-            overlap_indexes=overlap(Mat(row,col),filter_size,filter_center,Index(i,j))
-            local_pixel=[[] for i in range(ch)]
-            for x,y in overlap_indexes:
-                for k in range(ch):
-                    local_pixel[k].append(img[x][y][k])
-            for k in  range(ch):
-                img_copy[i][j][k]=np.median(local_pixel[k])
+            x_start=func_update(i-filter_center.x,0,row)
+            y_start=func_update(j-filter_center.y,0,col)
+            x_end=func_update(x_start+filter_size.row-1,0,row)
+            y_end=func_update(y_start+filter_size.col-1,0,col)    
+            for cha in range(ch):
+                img_copy[i][j][cha]=np.median(img[x_start:x_end+1,y_start:y_end,cha])
             print(">>> {0:.2f}% Percent Complete   ".format(counter*total),end="\r")
             counter+=1
     print()
     return img_copy
-
-def debug():
-    img=mpimg.imread("./Lena.jpg")
-    img_noisy=random_noise(img, mode='s&p',amount=0.5)
-    # print(img[0][0])
-    # filter=[[0 for i in range(3)] for j in range(3)]
-
-    # mat=[# 6 x 6 matrix
-    #     [1,2,3,12,13,14],
-    #     [4,5,6,23,24,25],
-    #     [7,8,9,34,35,36],
-    #     [1,2,3,12,13,14],
-    #     [4,5,6,23,24,25],
-    #     [7,8,9,34,35,36],
-    # ]
-    # correlation_on(mat,filter,[1,1])
-    # print( overlap(Mat(5,5),Mat(3,3),Index(1,1),Index(0,1)) )
-    img_median=median_filtering(img_noisy,Mat(3,3),Index(1,1))
-    plt.imshow(img_noisy)
-    plt.savefig("q12_output/out_noisy.jpg")
-    plt.imshow(img_median)
-    plt.savefig("q12_output/out_median.jpg")
-    multishow(1,3,img,img_noisy,img_median)
 
 def multishow(rows=1,columns=1,*all_images):
     for i in range(len(all_images)):
@@ -113,4 +64,3 @@ if (__name__=="__main__"):
     from matplotlib import pyplot as plt,image as mpimg
     import numpy as np
     main()
-    # debug()
